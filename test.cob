@@ -17,6 +17,10 @@
        01 GRAIN-PER-PERSON PIC 9(3) VALUE 1.
        01 GRAIN-CONSUMED PIC 9(5).
        01 STARVED PIC 9(3).
+       01 SOW-RATE-PER-PERSON PIC 9(3) VALUE 10.
+       01 HARVEST-RATE-PER-PERSON PIC 9(3) VALUE 20.
+       01 MAX-SOWABLE PIC 9(5).
+       01 MAX-HARVESTABLE PIC 9(5).
        01 STAT-LINE.
            05 SL-YEAR PIC 9(4).
            05 FILLER PIC X(2) VALUE SPACES.
@@ -61,8 +65,13 @@
        SPRING-PHASE.
            MOVE "SPRING" TO SEASON
            PERFORM DISPLAY-STATS
-           DISPLAY "How much grain to sow?"
+           COMPUTE MAX-SOWABLE = PEOPLE * SOW-RATE-PER-PERSON
+           DISPLAY "How much grain to sow? (Max: " MAX-SOWABLE ")"
            ACCEPT GRAIN-TO-SOW
+           IF GRAIN-TO-SOW > MAX-SOWABLE
+               DISPLAY "Can't sow that much. Sowing max amount."
+               MOVE MAX-SOWABLE TO GRAIN-TO-SOW
+           END-IF
            IF GRAIN-TO-SOW > GRAIN
                DISPLAY "Not enough grain. Sowing all available grain."
                MOVE GRAIN TO GRAIN-TO-SOW
@@ -82,7 +91,10 @@
        AUTUMN-PHASE.
            MOVE "AUTUMN" TO SEASON
            PERFORM DISPLAY-STATS
-           COMPUTE GRAIN-HARVESTED = GRAIN-TO-SOW * HARVEST-MULTIPLIER
+           COMPUTE MAX-HARVESTABLE = PEOPLE * HARVEST-RATE-PER-PERSON
+           COMPUTE GRAIN-HARVESTED = FUNCTION MIN(
+               GRAIN-TO-SOW * HARVEST-MULTIPLIER,
+               MAX-HARVESTABLE)
            ADD GRAIN-HARVESTED TO GRAIN
            MOVE FUNCTION CONCATENATE("Harvested: ", GRAIN-HARVESTED, 
                " grain") TO SL-ACTION
