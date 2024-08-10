@@ -1,0 +1,22 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Compile COBOL",
+        "type": "shell",
+        "command": "cobc",
+        "args": [
+          "-x",
+          "${file}",
+          "-o",
+          "${fileDirname}/${fileBasenameNoExtension}"
+        ],
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        },
+        "problemMatcher": []
+      }
+    ]
+  }
+  
